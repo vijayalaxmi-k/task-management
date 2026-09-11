@@ -1,58 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel API backend for the Task Management application.
 
-## About Laravel
+## Tech stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* PHP 8.3+
+* Laravel 13
+* Laravel Sanctum
+* SQLite
+* PHPUnit
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Setup
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+From the project root:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The `.env` is already configured for SQLite (`DB_CONNECTION=sqlite`) — no database server to install or configure.
 
-## Contributing
+Create the database file:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+touch database/database.sqlite
+```
 
-## Code of Conduct
+Run migrations:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate
+```
 
-## Security Vulnerabilities
+Start the API:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan serve
+```
 
-## License
+The API is available at:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```text
+http://localhost:8000
+```
+
+## Authentication
+
+The API uses Laravel Sanctum personal access tokens.
+
+Users can:
+
+* Register
+* Log in
+* Log out
+
+Authenticated requests must include:
+
+```text
+Authorization: Bearer <token>
+```
+
+## API endpoints
+
+| Method | Endpoint                   | Description        |
+| ------ | -------------------------- | ------------------ |
+| POST   | `/api/register`            | Register a user    |
+| POST   | `/api/login`               | Log in             |
+| POST   | `/api/logout`              | Log out            |
+| GET    | `/api/tasks`               | List user's tasks  |
+| POST   | `/api/tasks`               | Create a task      |
+| GET    | `/api/tasks/{task}`        | View a task        |
+| PUT    | `/api/tasks/{task}`        | Update a task      |
+| PATCH  | `/api/tasks/{task}/status` | Update task status |
+| DELETE | `/api/tasks/{task}`        | Delete a task      |
+
+The task list supports:
+
+```text
+/api/tasks?search=project&status=todo&priority=high
+```
+
+## Architecture
+
+The implementation uses standard Laravel conventions:
+
+* **Controllers** — API request handling
+* **Form Requests** — input validation
+* **API Resources** — consistent responses
+* **Eloquent Models** — database relationships
+* **Policies** — task ownership and authorization
+* **Migrations** — database schema
+* **Factories** — test data generation
+
+Tasks belong to the authenticated user. Task queries are scoped to the current user, and individual task operations are protected by `TaskPolicy`.
+
+No service/repository layer was added because the feature is small and the additional abstraction would not provide meaningful value for this scope.
+
+## Tests
+
+Run all backend tests:
+
+```bash
+php artisan test
+```
+
+Tests cover:
+
+* Authentication
+* Task CRUD
+* Validation
+* Task status updates
+* Authorization
+* User task isolation
+* Search
+* Status filtering
+* Priority filtering
+* Combined filters
+
+## Assumptions
+
+* Each task belongs to one user.
+* Users cannot share tasks.
+* Any task status can be changed directly.
+* Due dates are optional.
+* Email verification and password reset are outside the scope of the exercise.
+* Notifications and reminders are outside the scope.
+* Pagination is not implemented for this small dataset.
+
+## Possible improvements
+
+For a larger production application, this could be extended with:
+
+* Pagination
+* Email verification and password reset
+* Task sharing and permissions
+* Notifications and reminders
+* More extensive API and frontend tests
+* Environment-based frontend API configuration

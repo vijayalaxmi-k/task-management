@@ -1,75 +1,136 @@
-# React + TypeScript + Vite
+# Task Management Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript frontend for the Task Management application.
 
-Currently, two official plugins are available:
+## Tech stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* React 19
+* TypeScript
+* Vite
+* Axios
+* ESLint
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+From the project root:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+The frontend is available at:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+http://localhost:5173
 ```
+
+The backend API runs at:
+
+```text
+http://localhost:8000/api
+```
+
+The API URL is currently configured in:
+
+```text
+src/api/axios.ts
+```
+
+## Features
+
+* User registration, login, and logout
+* Task listing
+* Create tasks
+* Edit tasks
+* Delete tasks with confirmation
+* Update task status directly from the list
+* Search by title or description
+* Filter by status
+* Filter by priority
+* Combine search and filters
+* Loading, empty, and error states
+* Overdue due-date indication
+* Responsive layout
+* Form validation
+
+## Project structure
+
+```text
+src/
+├── api/             API and authentication requests
+├── components/      Reusable UI components
+├── constants/       Shared task options
+├── pages/           Application pages
+├── types/           TypeScript types
+├── App.tsx
+└── main.tsx
+```
+
+## Authentication
+
+The frontend uses the Laravel API with Sanctum bearer tokens.
+
+After registering or logging in, the access token is stored locally and automatically attached to API requests through the Axios interceptor.
+
+## State management
+
+The application uses plain React component state.
+
+A dedicated state-management library was not added because the application is small and the current state requirements can be handled cleanly with React's built-in state management.
+
+## API integration
+
+API requests are centralized under:
+
+```text
+src/api/
+```
+
+Task operations include:
+
+* Fetch tasks
+* Create task
+* Update task
+* Update task status
+* Delete task
+
+## Validation and error handling
+
+The UI provides client-side validation for required task fields and displays API validation or request errors to the user.
+
+Loading states are shown during API operations to prevent duplicate actions and provide feedback.
+
+## Quality checks
+
+Run ESLint:
+
+```bash
+npm run lint
+```
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+Both should pass before submitting the project.
+
+## Assumptions
+
+* The backend is responsible for authoritative validation and authorization.
+* The frontend assumes the API is available at `http://localhost:8000/api`.
+* Authentication uses bearer tokens returned by the backend.
+* No global state-management library is required for the current scope.
+
+## Possible improvements
+
+* Configure the API URL through environment variables.
+* Add automated frontend component/E2E tests.
+* Add pagination for larger task lists.
+* Add more detailed accessibility testing.
+* Add a password reset flow.
+
+The implementation intentionally keeps the frontend small and maintainable while covering the core task-management workflow required for the exercise.
